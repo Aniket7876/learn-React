@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import authService from './appwrite/auth';
 import { login, logout } from './store/authSlice';
 import { Header, Footer } from './components';
+import { Outlet } from 'react-router-dom';
 import './App.css';
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    // Check for an existing session
     authService
       .getCurrentUser()
       .then(userData => {
@@ -20,19 +22,28 @@ function App() {
         }
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [dispatch]);
 
-  return !loading ? (
-    <>
-      <div className="min-h-screen flex flex-wrap content-between bg-gray-400">
-        <div className="w-full block">
-          <Header />
-          <main>{/* <Outlet /> */}</main>
-          <Footer />
-        </div>
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <h1>Loading...</h1>
       </div>
-    </>
-  ) : null;
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-wrap content-between bg-gray-400">
+      <div className="w-full block">
+        <Header />
+        <main>
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
+    </div>
+  );
 }
 
 export default App;

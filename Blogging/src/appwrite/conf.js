@@ -1,7 +1,9 @@
 import config from '../config/config.js';
 import { Client, Databases, Query, Storage, ID } from 'appwrite';
+import { Account } from 'appwrite';
 
 export class Service {
+  account;
   client = new Client();
   databases;
   bucket;
@@ -10,6 +12,7 @@ export class Service {
     this.client.setEndpoint(config.appwriteURL).setProject(config.appwriteProjectID);
     this.databases = new Databases(this.client);
     this.bucket = new Storage(this.client);
+    this.account = new Account(this.client);
   }
 
   async createPost({ title, slug, content, featuredImage, status, userId }) {
@@ -110,6 +113,24 @@ export class Service {
 
   getFilePreview(fileId) {
     return this.bucket.getFilePreview(config.appwriteBucketID, fileId);
+  }
+
+  async login(email, password) {
+    try {
+      return await this.account.createSession(email, password);
+    } catch (error) {
+      console.log('Error in login', error);
+      return false;
+    }
+  }
+
+  async logout() {
+    try {
+      return await this.account.deleteSession('current');
+    } catch (error) {
+      console.log('Error in logout', error);
+      return false;
+    }
   }
 }
 

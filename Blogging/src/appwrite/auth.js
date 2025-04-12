@@ -33,11 +33,14 @@ export class AuthService {
 
   async getCurrentUser() {
     try {
-      return await this.account.get();
+      const session = await this.account.getSession('current');
+      if (session) {
+        return await this.account.get();
+      }
+      return null;
     } catch (error) {
-      console.log('Error in get current user: ', error);
+      return null;
     }
-    return null;
   }
 
   async logout() {
